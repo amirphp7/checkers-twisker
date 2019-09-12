@@ -64,7 +64,7 @@ class GameBoard extends Component {
 			if (this.winDetection(this.state.board, this.state.activePlayer)) {
 				console.log(this.state.activePlayer+ ' won the game!');
 				if(this.state.activePlayer === 'r') {
-					alert('Congratulations! you killed all the enemy!');
+					alert('Congratulations! you have killed all the enemy!');
 					this.reset();
 				}
 				else {
