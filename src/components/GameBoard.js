@@ -35,8 +35,18 @@ class GameBoard extends Component {
 				<button onClick={this.reset}>Reset</button>
 				<button onClick={this.aboutPopOpen}>About</button>
 				<Statistics board={this.state.board}/>
-				<Popup shown={this.state.popShown} close={this.aboutPopClose} copy="
-					Hey! Thanks for checking out my checkers game. I know that the title says 'React Checkers', but there isn't a ton of React in use here, it's only handling the display (that's its job, huh?). Essentially React displays our board array, and most of the moving and detection are just accessing that array. The AI is built out using a limited version of the minimax algorithm (see http://neverstopbuilding.com/minimax for a nice explanation of what that means), simply it means that the program forecasts futures, assumes you'll play as if you were doing the same, and picks the route that it thinks will result in the best for itself if you also play 'perfeclty', and I use that word loosely because this AI currently only looks 3 turns in to the future. It uses a point system to determine 'good' and 'bad' stuff that could happen, for example, if it can win in the next 3 turns, thats a 100 point outcome. If it will lose in the next 3 turns, thats worth -100 points, losing a king or killing an enemy king are worth -25 or 25 points respectively, and killing/losing regular pieces are worth +-10 points. Lastly, classifies making a new king of it's own as worth 15 points, so slightly better than killing 1 opponent. The bot looks through something like 1000-1500 possible futures before each move.
+					Application: Checkers AI Game
+					
+					Technology
+					Application: Checkers AI Game
+					Language: HTML5, CSS3, JavaScript
+					Framework: React, Bootstrap
+
+					Author: MD. Amir Hossain
+					Email: amirhossain@gmail.com
+					Skype: amir007h
+
+					The AI is built out using a limited version of the minimax algorithm (see http://neverstopbuilding.com/minimax for a nice explanation of what that means), simply it means that the program forecasts futures, assumes you'll play as if you were doing the same, and picks the route that it thinks will result in the best for itself if you also play 'perfeclty', and I use that word loosely because this AI currently only looks 3 turns in to the future. It uses a point system to determine 'good' and 'bad' stuff that could happen, for example, if it can win in the next 3 turns, thats a 100 point outcome. If it will lose in the next 3 turns, thats worth -100 points, losing a king or killing an enemy king are worth -25 or 25 points respectively, and killing/losing regular pieces are worth +-10 points. Lastly, classifies making a new king of it's own as worth 15 points, so slightly better than killing 1 opponent. The bot looks through something like 1000-1500 possible futures before each move.
 				"/>
 			</div>
 		);
@@ -54,15 +64,12 @@ class GameBoard extends Component {
 		var rowIndex = parseInt(e.target.attributes['data-row'].nodeValue);
 		var cellIndex = parseInt(e.target.attributes['data-cell'].nodeValue);
 		if (this.state.board[rowIndex][cellIndex].indexOf(this.state.activePlayer) > -1) {
-			//this is triggered if the piece that was clicked on is one of the player's own pieces, it activates it and highlights possible moves
-			this.state.board = this.state.board.map(function(row){return row.map(function(cell){return cell.replace('a', '')});}); //un-activate any previously activated pieces
+			this.state.board = this.state.board.map(function(row){return row.map(function(cell){return cell.replace('a', '')});});
 			this.state.board[rowIndex][cellIndex] = 'a'+this.state.board[rowIndex][cellIndex];
 			this.highlightPossibleMoves(rowIndex, cellIndex);
 		}
 		else if(this.state.board[rowIndex][cellIndex].indexOf('h') > -1) {
-			//this is activated if the piece clicked is a highlighted square, it moves the active piece to that spot.
 			this.state.board = this.executeMove(rowIndex, cellIndex, this.state.board, this.state.activePlayer);
-			//is the game over? if not, swap active player
 			this.setState(this.state);
 			if (this.winDetection(this.state.board, this.state.activePlayer)) {
 				console.log(this.state.activePlayer+ ' won the game!');
@@ -88,14 +95,12 @@ class GameBoard extends Component {
 	executeMove = (rowIndex, cellIndex, board, activePlayer) => {
 		var activePiece;
 		for (var i = 0; i < board.length; i++) {
-			//for each row
 			for (var j = 0; j < board[i].length; j++) {
 				if (board[i][j].indexOf('a')>-1) {
 					activePiece = board[i][j];
 				}
 			}
 		}
-		//make any jump deletions
 		var deletions = board[rowIndex][cellIndex].match(/d\d\d/g);
 		if (typeof deletions !== undefined && deletions !== null && deletions.length > 0) {
 			for (var k = 0; k < deletions.length; k++) {
@@ -103,11 +108,8 @@ class GameBoard extends Component {
 				board[deleteCoords[0]][deleteCoords[1]] = '-';
 			}
 		}
-		//remove active piece from it's place
 		board = board.map(function(row){return row.map(function(cell){return cell.replace(activePiece, '-')});});
-		//unhighlight
 		board = board.map(function(row){return row.map(function(cell){return cell.replace('h', '-').replace(/d\d\d/g, '').trim()});}); 
-		//place active piece, now unactive, in it's new place
 		board[rowIndex][cellIndex] = activePiece.replace('a', '');
 		if ( (activePlayer === 'b' && rowIndex === 7) || (activePlayer === 'r' && rowIndex === 0) ) {
 			board[rowIndex][cellIndex]+= ' k';
@@ -116,13 +118,10 @@ class GameBoard extends Component {
     }
     
 	highlightPossibleMoves = (rowIndex, cellIndex) => {
-		//unhighlight any previously highlighted cells
 		this.state.board = this.state.board.map(function(row){return row.map(function(cell){return cell.replace('h', '-').replace(/d\d\d/g, '').trim()});}); 
 
 		var possibleMoves = this.findAllPossibleMoves(rowIndex, cellIndex, this.state.board, this.state.activePlayer);
 
-		//actually highlight the possible moves on the board
-		//the 'highlightTag' inserts the information in to a cell that specifies 
 		for (var j = 0; j < possibleMoves.length; j++) {
 			var buildHighlightTag = 'h ';
 			for (var k = 0; k < possibleMoves[j].wouldDelete.length; k++) {
@@ -146,16 +145,10 @@ class GameBoard extends Component {
 			directionOfMotion.push(-1);
 		}
 
-		//if it's a king, we allow it to both go forward and backward, otherwise it can only move in it's color's normal direction
-		//the move loop below runs through every direction of motion allowed, so if there are two it will hit them both
 		if (isKing) {
 			directionOfMotion.push(directionOfMotion[0]*-1);
 		}
 
-		//normal move detection happens here (ie. non jumps)
-		//for each direction of motion allowed to the piece it loops (forward for normal pieces, both for kings)
-		//inside of that loop, it checks in that direction of motion for both left and right (checkers move diagonally)
-		//any moves found are pushed in to the possible moves array
 		for (var j = 0; j < directionOfMotion.length; j++) {
 			for (var i = 0; i < leftOrRight.length; i++) {			
 				if (
@@ -170,10 +163,8 @@ class GameBoard extends Component {
 			}
 		}
 
-		//get jumps
 		var jumps = this.findAllJumps(rowIndex, cellIndex, board, directionOfMotion[0], [], [], isKing, activePlayer);
 		
-		//loop and push all jumps in to possibleMoves
 		for (var k = 0; k < jumps.length; k++) {
 			possibleMoves.push(jumps[k]);
 		}
@@ -181,20 +172,14 @@ class GameBoard extends Component {
     }
     
 	findAllJumps = (sourceRowIndex, sourceCellIndex, board, directionOfMotion, possibleJumps, wouldDelete, isKing, activePlayer) => {
-		//jump moves
 		var thisIterationDidSomething = false;
 		var directions = [directionOfMotion];
 		var leftOrRight = [1, -1];
 		if (isKing) {
-			//if it's a king, we'll also look at moving backwards
 			directions.push(directions[0]*-1);
 		}
-		//here we detect any jump possible moves
-		//for each direction available to the piece (based on if it's a king or not) 
-		//and for each diag (left or right) we look 2 diag spaces away to see if it's open and if we'd jump an enemy to get there.
 		for (var k = 0; k < directions.length; k++) {
 			for (var l = 0; l < leftOrRight.length; l++) {
-				//leftOrRight[l]
 				if (
 					typeof board[sourceRowIndex+directions[k]] !== 'undefined' &&
 					typeof board[sourceRowIndex+directions[k]][sourceCellIndex+leftOrRight[l]] !== 'undefined' &&
@@ -204,7 +189,6 @@ class GameBoard extends Component {
 					board[sourceRowIndex+(directions[k]*2)][sourceCellIndex+(leftOrRight[l]*2)] === '-'
 				){
 					if (possibleJumps.map(function(move){return String(move.targetRow)+String(move.targetCell);}).indexOf(String(sourceRowIndex+(directions[k]*2))+String(sourceCellIndex+(leftOrRight[l]*2))) < 0) {
-						//this eventual jump target did not already exist in the list
 						var tempJumpObject = {
 							targetRow: sourceRowIndex+(directions[k]*2),
 							targetCell: sourceCellIndex+(leftOrRight[l]*2),
@@ -225,7 +209,6 @@ class GameBoard extends Component {
 			}
 		}
 		
-		//if a jump was found, thisIterationDidSomething is set to true and this function calls itself again from that source point, this is how we recurse to find multi jumps
 		if(thisIterationDidSomething) {
 			for (var m = 0; m < possibleJumps.length; m++) {
 				var coords = [possibleJumps[m].targetRow, possibleJumps[m].targetCell];
@@ -276,13 +259,11 @@ class GameBoard extends Component {
     }
 
 	ai = () => {
-		//prep a branching future prediction
 		this.count = 0;
 		console.time('decisionTree');
 		var decisionTree = this.aiBranch(this.state.board, this.state.activePlayer, 1);
 		console.timeEnd('decisionTree');
 		console.log(this.count);
-		//execute the most favorable move
 		if (decisionTree.length > 0) {
 			console.log(decisionTree[0]);
 			setTimeout(function() {
@@ -348,12 +329,9 @@ class GameBoard extends Component {
 							activePlayer: activePlayer,
 							depth: depth,
 						}
-						//does that move win the game?
 						buildingObject.terminal = this.winDetection(buildingObject.board, activePlayer);						
 
 						if (buildingObject.terminal) {
-							//console.log('a terminal move was found');
-							//if terminal, score is easy, just depends on who won
 							if (activePlayer === this.state.activePlayer) {
 								buildingObject.score = 100-depth;
 							}
@@ -362,12 +340,10 @@ class GameBoard extends Component {
 							}
 						}
 						else if(depth > this.state.aiDepthCutoff) {
-							//don't want to blow up the call stack boiiiiii
 							buildingObject.score = 0;
 						}
 						else {	
 							buildingObject.children = this.aiBranch(buildingObject.board, (activePlayer === 'r' ? 'b' : 'r'), depth+1);
-							//if not terminal, we want the best score from this route (or worst depending on who won)							
 							var scoreHolder = [];
 
 					        for (var l = 0; l < buildingObject.children.length; l++) {
@@ -405,7 +381,6 @@ class GameBoard extends Component {
 								}
 							}
 							if ((JSON.stringify(hypotheticalBoard).match(/k/g) || []).length < (JSON.stringify(buildingObject.board).match(/k/g) || []).length) {
-								//new king made after this move
 								buildingObject.score+=(15-depth);
 							}
 						}
@@ -419,7 +394,6 @@ class GameBoard extends Component {
 								}
 							}							
 							if ((JSON.stringify(hypotheticalBoard).match(/k/g) || []).length < (JSON.stringify(buildingObject.board).match(/k/g) || []).length) {
-								//new king made after this move
 								buildingObject.score-=(15-depth);
 							}
 						}
