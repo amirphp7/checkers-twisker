@@ -35,6 +35,7 @@ class GameBoard extends Component {
 				<button onClick={this.reset}>Reset</button>
 				<button onClick={this.aboutPopOpen}>About</button>
 				<Statistics board={this.state.board}/>
+				<Popup shown={this.state.popShown} close={this.aboutPopClose} copy="
 					Application: Checkers AI Game
 					
 					Technology
