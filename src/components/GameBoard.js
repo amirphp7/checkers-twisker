@@ -27,7 +27,7 @@ class GameBoard extends Component {
 				<div className={'board '+this.state.activePlayer}>
 					{
 						this.state.board.map(function(row, index) {
-							return (<Row rowArr={row} handlePieceClick={this.handlePieceClick.bind(this)} rowIndex={index}/>)
+							return (<Row rowArr={row} handlePieceClick={this.handlePieceClick.bind(this)} rowIndex={index} key={index} />)
 						},this)
 					}
 				</div>
@@ -66,6 +66,14 @@ class GameBoard extends Component {
 			this.setState(this.state);
 			if (this.winDetection(this.state.board, this.state.activePlayer)) {
 				console.log(this.state.activePlayer+ ' won the game!');
+				if(this.state.activePlayer === 'r') {
+					alert('Congratulations! you killed all the enemy!');
+					this.reset();
+				}
+				else {
+					alert('Defeated! You lose all of your soldier!');
+					this.reset();
+				}
 			}
 			else {
 				this.state.activePlayer = (this.state.activePlayer === 'r' ? 'b' : 'r');
@@ -308,7 +316,8 @@ class GameBoard extends Component {
 			}.bind(this), 750);
 		}
 		else {
-			alert('no moves, you win!');
+			alert('Congratulations! opponent no moves, you win!');
+			this.reset();
 		}
     }
     

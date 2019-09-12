@@ -8,7 +8,7 @@ class Row extends Component {
 				{
 					this.props.rowArr.map(function(cell, index) {
 						return (
-							<Cell rowIndex={this.props.rowIndex} index={index} cell={cell} handlePieceClick={this.props.handlePieceClick} />
+							<Cell rowIndex={this.props.rowIndex} index={index} cell={cell} handlePieceClick={this.props.handlePieceClick} key={index} />
 						)
 					}, this)
 				}
